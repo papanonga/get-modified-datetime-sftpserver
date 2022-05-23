@@ -3,9 +3,6 @@ const sftp = new Client();
 const fs = require('fs')
 const path = require('path');
 const { error } = require('console');
-const { rejects } = require('assert');
-const { resolve } = require('path');
-const { resourceLimits } = require('worker_threads');
 
 async function connectFtp({ host, port, username, password }) {
     return await sftp.connect({
@@ -16,7 +13,6 @@ async function connectFtp({ host, port, username, password }) {
     })
 }
 
-
 // setup connection string as here
 function connectTionString() {
     return {
@@ -26,10 +22,6 @@ function connectTionString() {
         password: ''
     }
 }
-
-
-
-
 
 async function recursiveSearch(pathTarget){
     try {
@@ -65,13 +57,14 @@ async function recursiveSearch(pathTarget){
 }
 
 
-function fileFilter(files) {
+async function fileFilter(files) {
     let fileAfterFilter = []
     files.forEach((element, index) => {
         fileAfterFilter.push({
             no: index + 1,
             name: element.name,
-            modifyTime: new Date(element.modifyTime).toUTCString()
+            modifyTime: new Date(element.modifyTime).toUTCString(),
+            path: element.path
         })
     });
     return fileAfterFilter
@@ -79,12 +72,12 @@ function fileFilter(files) {
 
 
 async function writeLogFile(data) {
-    console.log(data)
+    // console.log(data)
     fs.writeFileSync('./log.txt', ``, (err) => {
         if (err) throw err;
     })
     data.forEach(element => {
-        fs.appendFileSync('./log.txt', `No ${element.no} - filename: ${element.name} - modifytime: ${element.modifyTime} - Path : {}\n`, (err) => {
+        fs.appendFileSync('./log.txt', `No ${element.no} - filename: ${element.name} - modifytime: ${new Date(element.modifyTime).getFullYear()}:${new Date(element.modifyTime).getMonth()}:${new Date(element.modifyTime).getDate()}  - Path : ${element.path}\n`, (err) => {
             if (err) throw err;
         })
     })
@@ -92,18 +85,15 @@ async function writeLogFile(data) {
     return
 }
 
-
-
 const PATHTARGET = '/home/NBTC_LTEa/ftp/demo'
-
-
 
 async function main() {
 
     await connectFtp(connectTionString())
-    const demo = await recursiveSearch(PATHDEMO)
+    const data = await recursiveSearch(PATHTARGET)
+    const filtered = await fileFilter(data)
+    await writeLogFile(filtered)
 }
-
 
 main()
 
