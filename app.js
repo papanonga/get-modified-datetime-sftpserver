@@ -77,7 +77,7 @@ async function writeLogFile(data) {
         if (err) throw err;
     })
     data.forEach(element => {
-        fs.appendFileSync('./log.txt', `No ${element.no} - filename: ${element.name} - modifytime: ${new Date(element.modifyTime).getFullYear()}:${new Date(element.modifyTime).getMonth()}:${new Date(element.modifyTime).getDate()}  - Path : ${element.path}\n`, (err) => {
+        fs.appendFileSync('./log.txt', `No ${element.no} - filename: ${element.name} - modifytime: ${new Date(element.modifyTime).getFullYear()}:${new Date(element.modifyTime).getMonth()+1}:${new Date(element.modifyTime).getDate()}  - Path : ${element.path}\n`, (err) => {
             if (err) throw err;
         })
     })
@@ -85,10 +85,9 @@ async function writeLogFile(data) {
     return
 }
 
-const PATHTARGET = '/home/NBTC_LTEa/ftp/demo'
+const PATHTARGET = '/home/xxx'
 
 async function main() {
-
     await connectFtp(connectTionString())
     const data = await recursiveSearch(PATHTARGET)
     const filtered = await fileFilter(data)
